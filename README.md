@@ -5,7 +5,8 @@ Lightweight Linux system monitor that reads directly from `/proc` — no externa
 ## Features
 - CPU usage (aggregate, sampled every 3 seconds)
 - Memory usage (total, available, % used)
-- WIP: top 10 processes by CPU, spike alerts
+- Top 10 processes by CPU usage
+- Spike alerts for CPU and memory thresholds
 
 ## Requirements
 - Linux (or WSL)
