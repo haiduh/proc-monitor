@@ -1,11 +1,11 @@
 import time
 import os
-import sys
+from datetime import datetime
 from collections import namedtuple
 
 CPUStats = namedtuple("CPUStats", ["user", "nice", "system", "idle", "iowait", "irq", "softirq", "steal", "guest", "guest_nice"])
 ProcessStats = namedtuple("ProcessStats", ["pid", "process_name", "utime", "stime"])
-CPU_THRESHOLD = 0
+CPU_THRESHOLD = 80
 MEM_THRESHOLD = 80
 
 def read_cpu_stats():
@@ -101,18 +101,42 @@ def calculate_process_cpu(snapshot1, snapshot2, total_cpu_delta):
             name = pid1.process_name
             process_delta = (pid2.utime + pid2.stime) - (pid1.utime + pid1.stime)
             process_cpu_percent = (process_delta / total_cpu_delta) * 100
-            total_procs.append((i, name, process_cpu_percent))
+            rounded_process_percent = round(process_cpu_percent, 3)
+            total_procs.append((i, name, rounded_process_percent))
     
     res = sorted(total_procs, key= lambda x: x[2], reverse=True)[:10]
 
     return res
 
 def check_alerts(cpu_percent, mem_percent):
+    RED = "\033[91m"
+    RESET = "\033[0m"
     if cpu_percent > CPU_THRESHOLD:
-        print("CPU USAGE TOO HIGH: ", cpu_percent)
+        print(f"{RED}⚠ CPU USAGE TOO HIGH: {cpu_percent:.1f}%{RESET}\n")
     
     if mem_percent > MEM_THRESHOLD:
-        print("MEM USAGE TOO HIGH: ", mem_percent)
+        print(f"{RED}⚠ MEMORY USAGE TOO HIGH: {mem_percent:.1f}%{RESET}\n")
+        
+def display_proc(cpu_percent, mem_percent, top_procs):
+        now = datetime.now().strftime("%H:%M:%S")
+        print(f"proc-monitor | Last updated: {now}\n")
+        print(f"CPU: {colourise(cpu_percent, 40, CPU_THRESHOLD)}")
+        print(f"Memory: {colourise(mem_percent, 40, MEM_THRESHOLD)}\n")
+        check_alerts(total_cpu, total_memory)
+        print(f"{'PID':<8} {'NAME':<20} {'CPU%':>8}")
+        print("-" * 38)
+        for proc in top_procs:
+            print(f"{proc[0]:<8} {proc[1]:<20} {proc[2]:>8.2f}%")
+
+def colourise(value, low_threshold, high_threshold):
+    if value >= high_threshold:
+        code = "\033[91m"  # bright red
+    elif value >= low_threshold:
+        code = "\033[93m"  # bright yellow
+    else:
+        code = "\033[92m"  # bright green
+    return f"{code}{value:.1f}%\033[0m"
+        
 
 stats1 = read_cpu_stats()
 procs1 = get_all_processes()
@@ -127,7 +151,6 @@ while True:
     top_procs = calculate_process_cpu(procs1, procs2, total_cpu_delta)
     stats1 = stats2
     procs1 = procs2
-    print(f"{total_cpu}%")
-    print(f"{total_memory}%")
-    check_alerts(total_cpu, total_memory)
-    print(f"{top_procs}")
+    os.system("clear")
+    display_proc(total_cpu, total_memory, top_procs)
+
