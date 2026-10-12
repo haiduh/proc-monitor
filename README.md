@@ -1,8 +1,12 @@
 # proc-monitor
 
-Lightweight Linux system monitor that reads directly from `/proc` — no external dependencies.
+<div align="center">
 
 ![demo](assets/demo.gif)
+
+</div>
+
+Lightweight Linux system monitor that reads directly from `/proc` — no external dependencies.
 
 ## Features
 - CPU usage (aggregate, sampled every 3 seconds)
@@ -25,4 +29,6 @@ Rather than relying on third-party libraries like `psutil`, proc-monitor reads d
 - Python 3.x
 
 ## Usage
+```bash
 python3 main.py
+```
