@@ -17,6 +17,7 @@ Rather than relying on third-party libraries like `psutil`, proc-monitor reads d
 ## Screenshots
 
 ![normal usage](assets/normal.png)
+<br>
 ![alert](assets/alert.png)
 
 ## Requirements
